@@ -19,10 +19,11 @@ class User
     {
         $errors = [];
 
-        if (mb_strlen($data['name']) < 2) {
-            $errors['name'] = 'Please enter your full name.';
+        // Limits match the column sizes in database/fleur.sql (full_name 100, email 150, address 255)
+        if (mb_strlen($data['name']) < 2 || mb_strlen($data['name']) > 100) {
+            $errors['name'] = 'Please enter your full name (2 to 100 characters).';
         }
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL) || mb_strlen($data['email']) > 150) {
             $errors['email'] = 'Please enter a valid email address.';
         } elseif ($this->emailExists($data['email'])) {
             $errors['email'] = 'An account with this email already exists.';
@@ -36,8 +37,8 @@ class User
         if ($data['password'] !== $data['confirm_password']) {
             $errors['confirm_password'] = 'Passwords do not match.';
         }
-        if (mb_strlen($data['address']) < 5) {
-            $errors['address'] = 'Please enter your delivery address.';
+        if (mb_strlen($data['address']) < 5 || mb_strlen($data['address']) > 255) {
+            $errors['address'] = 'Please enter your delivery address (5 to 255 characters).';
         }
 
         return $errors;
@@ -45,7 +46,8 @@ class User
 
     public function emailExists(string $email): bool
     {
-        return $this->db->fetch('SELECT id FROM users WHERE email = ?', [$email]) !== null;
+        // Emails are stored in lower case, so compare in lower case too
+        return $this->db->fetch('SELECT id FROM users WHERE email = ?', [strtolower(trim($email))]) !== null;
     }
 
     /** Creates a customer account. The password is hashed, never stored as plain text. */
@@ -79,6 +81,7 @@ class User
         }
 
         session_regenerate_id(true); // new session id after login (prevents session fixation)
+        unset($_SESSION['login_failures'], $_SESSION['login_locked_until']);  // reset the wrong-password counter
         $_SESSION['user_id'] = (int) $user['user_id'];
         $_SESSION['name']    = $user['name'];
         $_SESSION['role']    = $user['role'];

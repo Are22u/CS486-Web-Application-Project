@@ -63,7 +63,7 @@ require __DIR__ . '/includes/header.php';
       <?= csrfField() ?>
       <div class="mb-3">
         <label class="form-label" for="recipient_name">Recipient name</label>
-        <input class="form-control<?= invalid($errors, 'recipient_name') ?>" id="recipient_name" name="recipient_name"
+        <input class="form-control<?= invalid($errors, 'recipient_name') ?>" id="recipient_name" name="recipient_name" maxlength="100"
                value="<?= old('recipient_name', $profile['name'] ?? '') ?>" required>
         <?= fieldError($errors, 'recipient_name') ?>
       </div>
@@ -75,7 +75,7 @@ require __DIR__ . '/includes/header.php';
       </div>
       <div class="mb-3">
         <label class="form-label" for="delivery_address">Delivery address</label>
-        <input class="form-control<?= invalid($errors, 'delivery_address') ?>" id="delivery_address" name="delivery_address"
+        <input class="form-control<?= invalid($errors, 'delivery_address') ?>" id="delivery_address" name="delivery_address" maxlength="255"
                value="<?= old('delivery_address', $profile['address'] ?? '') ?>" required>
         <?= fieldError($errors, 'delivery_address') ?>
       </div>

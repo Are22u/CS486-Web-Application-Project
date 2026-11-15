@@ -45,12 +45,12 @@ require __DIR__ . '/includes/header.php';
       <?= csrfField() ?>
       <div class="mb-3">
         <label class="form-label" for="name">Full name</label>
-        <input class="form-control<?= invalid($errors, 'name') ?>" id="name" name="name" value="<?= old('name') ?>" required>
+        <input class="form-control<?= invalid($errors, 'name') ?>" id="name" name="name" value="<?= old('name') ?>" maxlength="100" required>
         <?= fieldError($errors, 'name') ?>
       </div>
       <div class="mb-3">
         <label class="form-label" for="email">Email</label>
-        <input class="form-control<?= invalid($errors, 'email') ?>" type="email" id="email" name="email" value="<?= old('email') ?>" required>
+        <input class="form-control<?= invalid($errors, 'email') ?>" type="email" id="email" name="email" value="<?= old('email') ?>" maxlength="150" required>
         <?= fieldError($errors, 'email') ?>
       </div>
       <div class="mb-3">
@@ -60,7 +60,7 @@ require __DIR__ . '/includes/header.php';
       </div>
       <div class="mb-3">
         <label class="form-label" for="address">Delivery address</label>
-        <input class="form-control<?= invalid($errors, 'address') ?>" id="address" name="address" value="<?= old('address') ?>" required>
+        <input class="form-control<?= invalid($errors, 'address') ?>" id="address" name="address" value="<?= old('address') ?>" maxlength="255" required>
         <?= fieldError($errors, 'address') ?>
       </div>
       <div class="mb-3">

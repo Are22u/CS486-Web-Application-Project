@@ -18,14 +18,15 @@ class Order
     {
         $errors = [];
 
-        if (mb_strlen($data['recipient_name']) < 2) {
-            $errors['recipient_name'] = 'Please enter the recipient\'s name.';
+        // Limits match the orders table (recipient_name 100, delivery_address 255, notes 255)
+        if (mb_strlen($data['recipient_name']) < 2 || mb_strlen($data['recipient_name']) > 100) {
+            $errors['recipient_name'] = 'Please enter the recipient\'s name (2 to 100 characters).';
         }
         if (!preg_match('/^05\d{8}$/', $data['phone'])) {
             $errors['phone'] = 'Phone must be 10 digits starting with 05.';
         }
-        if (mb_strlen($data['delivery_address']) < 5) {
-            $errors['delivery_address'] = 'Please enter the full delivery address.';
+        if (mb_strlen($data['delivery_address']) < 5 || mb_strlen($data['delivery_address']) > 255) {
+            $errors['delivery_address'] = 'Please enter the full delivery address (5 to 255 characters).';
         }
 
         $date = DateTime::createFromFormat('Y-m-d', $data['delivery_date']);

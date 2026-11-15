@@ -20,14 +20,29 @@ if (isLoggedIn()) {
 $error    = null;
 $redirect = safeRedirectTarget($_GET['redirect'] ?? $_POST['redirect'] ?? '');
 
+// Slow down password guessing: after 5 wrong attempts in this session, wait 60 seconds.
+// (Session-based, so it limits casual guessing; a per-account limit would need a database table.)
+const MAX_LOGIN_FAILURES = 5;
+const LOGIN_LOCK_SECONDS = 60;
+$lockedFor = max(0, ($_SESSION['login_locked_until'] ?? 0) - time());
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrf()) {
         $error = 'Your session expired. Please try again.';
+    } elseif ($lockedFor > 0) {
+        $error = "Too many failed attempts. Please try again in $lockedFor seconds.";
     } else {
         $user = (new User())->login(post('email'), $_POST['password'] ?? '');
 
         if ($user === null) {
-            $error = 'Incorrect email or password.';
+            $_SESSION['login_failures'] = ($_SESSION['login_failures'] ?? 0) + 1;
+            if ($_SESSION['login_failures'] >= MAX_LOGIN_FAILURES) {
+                $_SESSION['login_locked_until'] = time() + LOGIN_LOCK_SECONDS;
+                $_SESSION['login_failures'] = 0;
+                $error = 'Too many failed attempts. Please try again in ' . LOGIN_LOCK_SECONDS . ' seconds.';
+            } else {
+                $error = 'Incorrect email or password.';
+            }
         } elseif ($user['role'] === 'admin') {
             redirect('admin/dashboard.php');
         } elseif ($redirect !== null) {

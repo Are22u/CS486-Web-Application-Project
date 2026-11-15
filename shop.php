@@ -2,7 +2,10 @@
 require_once __DIR__ . '/includes/init.php';
 
 $productModel = new Product();
-$products = $productModel->all();
+
+// ?q=rose searches names and descriptions in the database; empty shows everything
+$search   = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100);
+$products = $search !== '' ? $productModel->search($search) : $productModel->all();
 
 // ?occasion=birthday (from the homepage occasion cards) pre-ticks that filter
 $selectedOccasion = (string) ($_GET['occasion'] ?? '');
@@ -90,6 +93,16 @@ require __DIR__ . '/includes/header.php';
             </label>
           </div>
 
+          <form class="shop-search" method="get" action="shop.php" role="search">
+            <label for="shop-q" class="visually-hidden">Search bouquets</label>
+            <input type="search" id="shop-q" name="q" value="<?= e($search) ?>" maxlength="100" placeholder="Search bouquets, e.g. rose" class="form-control">
+            <button type="submit" class="btn btn-rose btn-sm">Search</button>
+            <?php if ($search !== ''): ?><a href="shop.php" class="btn btn-ghost btn-sm">Clear</a><?php endif; ?>
+          </form>
+          <?php if ($search !== ''): ?>
+            <p class="shop-search-note" role="status"><?= count($products) ?> result<?= count($products) === 1 ? '' : 's' ?> for &ldquo;<?= e($search) ?>&rdquo;</p>
+          <?php endif; ?>
+
           <h2 class="visually-hidden">Bouquets</h2>
           <div class="product-grid cols-3" data-shop-grid>
             <?php foreach ($products as $index => $product): ?>
@@ -116,11 +129,11 @@ require __DIR__ . '/includes/header.php';
                   <?php if ($productTag !== ''): ?>
                     <span class="product-tag"><?= e($productTag) ?></span>
                   <?php endif; ?>
-                  <img src="<?= e($productImage) ?>" alt="<?= e($productName) ?>" width="400" height="400" loading="lazy">
+                  <a href="product.php?id=<?= $productId ?>" tabindex="-1" aria-hidden="true"><img src="<?= e($productImage) ?>" alt="<?= e($productName) ?>" width="400" height="400" loading="lazy"></a>
                 </div>
 
                 <div class="product-body">
-                  <h3><?= e($productName) ?></h3>
+                  <h3><a href="product.php?id=<?= $productId ?>" class="product-link"><?= e($productName) ?></a></h3>
                   <p class="note"><?= e($productDescription) ?></p>
 
                   <div class="product-foot">
@@ -147,7 +160,7 @@ require __DIR__ . '/includes/header.php';
               </article>
             <?php endforeach; ?>
 
-            <p class="empty-note" hidden>No bouquets match those filters. Try clearing a few.</p>
+            <p class="empty-note"<?= ($search !== '' && !$products) ? '' : ' hidden' ?>><?= ($search !== '' && !$products) ? 'No bouquets match your search. Try another word.' : 'No bouquets match those filters. Try clearing a few.' ?></p>
           </div>
         </div>
       </div>

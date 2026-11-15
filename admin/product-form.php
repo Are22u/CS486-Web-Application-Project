@@ -71,27 +71,28 @@ require __DIR__ . '/../includes/header.php';
   <?= csrfField() ?>
   <div class="col-12">
     <label class="form-label" for="name">Name</label>
-    <input class="form-control<?= invalid($errors, 'name') ?>" id="name" name="name" value="<?= $val('name') ?>" required>
+    <input class="form-control<?= invalid($errors, 'name') ?>" id="name" name="name" maxlength="100" value="<?= $val('name') ?>" required>
     <?= fieldError($errors, 'name') ?>
   </div>
   <div class="col-12">
     <label class="form-label" for="description">Description</label>
-    <textarea class="form-control<?= invalid($errors, 'description') ?>" id="description" name="description" rows="3" required><?= $val('description') ?></textarea>
+    <textarea class="form-control<?= invalid($errors, 'description') ?>" id="description" name="description" maxlength="2000" rows="3" required><?= $val('description') ?></textarea>
     <?= fieldError($errors, 'description') ?>
   </div>
   <div class="col-md-4">
     <label class="form-label" for="price">Price (SAR)</label>
-    <input class="form-control<?= invalid($errors, 'price') ?>" type="number" step="0.01" min="0.01" id="price" name="price" value="<?= $val('price') ?>" required>
+    <input class="form-control<?= invalid($errors, 'price') ?>" type="number" step="0.01" min="0.01" max="999999.99" id="price" name="price" value="<?= $val('price') ?>" required>
     <?= fieldError($errors, 'price') ?>
   </div>
   <div class="col-md-4">
     <label class="form-label" for="stock">Stock</label>
-    <input class="form-control<?= invalid($errors, 'stock') ?>" type="number" min="0" step="1" id="stock" name="stock" value="<?= $val('stock') ?>" required>
+    <input class="form-control<?= invalid($errors, 'stock') ?>" type="number" min="0" max="1000000" step="1" id="stock" name="stock" value="<?= $val('stock') ?>" required>
     <?= fieldError($errors, 'stock') ?>
   </div>
   <div class="col-md-4">
     <label class="form-label" for="tag">Tag <span class="text-muted">(optional)</span></label>
-    <input class="form-control" id="tag" name="tag" maxlength="30" value="<?= $val('tag') ?>" placeholder="Bestseller">
+    <input class="form-control<?= invalid($errors, 'tag') ?>" id="tag" name="tag" maxlength="30" value="<?= $val('tag') ?>" placeholder="Bestseller">
+    <?= fieldError($errors, 'tag') ?>
   </div>
   <div class="col-md-6">
     <label class="form-label" for="category_id">Occasion</label>

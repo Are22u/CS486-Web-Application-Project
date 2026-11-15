@@ -1262,3 +1262,16 @@ a:hover { color: var(--rose-deep); }
 /* Phone menu: the backdrop must sit below the navbar (z-index 1030), otherwise
    it covers the open menu and taps on menu links only close the menu */
 .nav-backdrop { z-index: 1025; }
+/* Shop search and product links */
+.shop-search { display: flex; gap: .5rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+.shop-search .form-control { flex: 1 1 220px; border-radius: 999px; padding: .55rem 1rem; }
+.shop-search-note { color: var(--stone); margin: -.25rem 0 1rem; font-size: .92rem; }
+.product-link { color: inherit; text-decoration: none; }
+.product-link:hover, .product-link:focus-visible { color: var(--rose); }
+.product-media a { display: block; }
+/* Product details page */
+.product-detail-img { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 18px; }
+.product-detail .product-price { font-size: 1.6rem; }
+.product-facts { max-width: 420px; background: transparent; }
+.product-facts th { width: 40%; font-weight: 500; color: var(--stone); }
+.add-btn-lg { padding: .75rem 1.6rem; font-size: .95rem; }

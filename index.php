@@ -136,10 +136,10 @@ require __DIR__ . '/includes/header.php';
           <article class="product-card reveal<?= ['', ' d1', ' d2', ' d3'][$i % 4] ?>" data-occasion="<?= e($p['category_slug']) ?>">
             <div class="product-media">
               <?php if (!empty($p['tag'])): ?><span class="product-tag"><?= e($p['tag']) ?></span><?php endif; ?>
-              <img src="<?= e($p['image']) ?>" alt="<?= e($p['name']) ?> bouquet" width="400" height="400" loading="lazy">
+              <a href="product.php?id=<?= (int) $p['product_id'] ?>" tabindex="-1" aria-hidden="true"><img src="<?= e($p['image']) ?>" alt="<?= e($p['name']) ?> bouquet" width="400" height="400" loading="lazy"></a>
             </div>
             <div class="product-body">
-              <h3><?= e($p['name']) ?></h3>
+              <h3><a href="product.php?id=<?= (int) $p['product_id'] ?>" class="product-link"><?= e($p['name']) ?></a></h3>
               <p class="note"><?= e($p['description']) ?></p>
               <div class="product-foot">
                 <span class="product-price"><?= money($p['price']) ?></span>

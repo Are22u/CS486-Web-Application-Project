@@ -36,6 +36,25 @@ class Product
         );
     }
 
+    /**
+     * Search by name or description (shop.php?q=...).
+     * The search text is bound as a parameter, so it cannot change the SQL.
+     */
+    public function search(string $term): array
+    {
+        // Escape LIKE wildcards with "!" so "%" or "_" typed by the user are matched literally
+        // ("!" works the same in MySQL, MariaDB and SQLite, unlike a backslash).
+        $like = '%' . strtr(mb_strtolower($term), ['!' => '!!', '%' => '!%', '_' => '!_']) . '%';
+        return $this->db->fetchAll(
+            "SELECT p.*, p.id AS product_id, p.occasion_id AS category_id, c.name AS category_name, c.slug AS category_slug
+             FROM products p
+             JOIN occasions c ON c.id = p.occasion_id
+             WHERE LOWER(p.name) LIKE ? ESCAPE '!' OR LOWER(p.description) LIKE ? ESCAPE '!'
+             ORDER BY p.id",
+            [$like, $like]
+        );
+    }
+
     /** A few products for the homepage "featured" grid. */
     public function featured(int $limit = 4): array
     {
@@ -99,17 +118,22 @@ class Product
     {
         $errors = [];
 
-        if (mb_strlen($data['name']) < 3) {
-            $errors['name'] = 'Name must be at least 3 characters.';
+        // Limits match the products table: name VARCHAR(100), tag VARCHAR(30),
+        // price DECIMAL(8,2) (0.01 to 999,999.99), stock INT
+        if (mb_strlen($data['name']) < 3 || mb_strlen($data['name']) > 100) {
+            $errors['name'] = 'Name must be 3 to 100 characters.';
         }
-        if (mb_strlen($data['description']) < 10) {
-            $errors['description'] = 'Description must be at least 10 characters.';
+        if (mb_strlen($data['description']) < 10 || mb_strlen($data['description']) > 2000) {
+            $errors['description'] = 'Description must be 10 to 2000 characters.';
         }
-        if (!is_numeric($data['price']) || $data['price'] <= 0) {
-            $errors['price'] = 'Price must be a positive number.';
+        if (!preg_match('/^\d{1,6}(\.\d{1,2})?$/', $data['price']) || (float) $data['price'] < 0.01) {
+            $errors['price'] = 'Price must be between 0.01 and 999999.99 SAR, with at most 2 decimals.';
         }
-        if (!ctype_digit($data['stock'])) {
-            $errors['stock'] = 'Stock must be a whole number (0 or more).';
+        if (!ctype_digit($data['stock']) || strlen($data['stock']) > 7 || (int) $data['stock'] > 1000000) {
+            $errors['stock'] = 'Stock must be a whole number from 0 to 1,000,000.';
+        }
+        if (mb_strlen($data['tag']) > 30) {
+            $errors['tag'] = 'Tag must be 30 characters or fewer.';
         }
         if (!in_array($data['color'], self::COLORS, true)) {
             $errors['color'] = 'Please choose a colour.';
