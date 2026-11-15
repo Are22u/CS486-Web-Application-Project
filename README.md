@@ -61,7 +61,9 @@ Each item below is implemented in the code.
 ## Running locally with XAMPP
 
 ### Requirements
-- XAMPP with **PHP 8.0 or newer** and MySQL/MariaDB (any current XAMPP release)
+- **PHP 8.0 or newer** with these extensions enabled: **mbstring** and **PDO MySQL** (`pdo_mysql`). Both are enabled by default in XAMPP.
+- **MySQL 8.0.16+ or MariaDB 10.2+** (needed for the CHECK constraints; current XAMPP releases ship MariaDB 10.4 or newer)
+- Apache (included in XAMPP)
 - A web browser
 
 ### Steps

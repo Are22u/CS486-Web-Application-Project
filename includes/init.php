@@ -67,7 +67,6 @@ define('BASE_URL', ($docRoot !== '' && str_starts_with($projectRoot, $docRoot))
     : '');
 
 // Where customers land after login/logout.
-// TODO (Member 1): change to 'index.php' once index.php is converted.
 define('HOME_PAGE', 'index.php');
 
 /** Builds a link relative to the project root: url('login.php') */

@@ -1246,3 +1246,19 @@ a:hover { color: var(--rose-deep); }
 .product-foot { gap: .5rem; }
 .cart-total .amt { white-space: nowrap; }
 @media (max-width: 576px) { .cart-total .amt { font-size: 1.5rem; } }
+/* Logout is a POST form (CSRF-protected); its button looks like the surrounding links */
+.logout-form { display: inline; margin: 0; }
+.nav-link-button, .footer-link-button {
+  background: none; border: 0; padding: 0; cursor: pointer; font: inherit; text-align: left;
+}
+.nav-link-button {
+  font-family: var(--sans); font-weight: 400; font-size: .92rem; letter-spacing: .02em;
+  color: var(--ink-soft); padding: .3rem 0; position: relative;
+}
+.nav-link-button:hover { color: var(--rose); }
+.footer-link-button { color: #B4ABA0; font-size: .95rem; }
+.footer-link-button:hover { color: var(--rose-tint); }
+@media (max-width: 992px) { .nav-link-button { font-size: 1.4rem; font-family: var(--serif); } }
+/* Phone menu: the backdrop must sit below the navbar (z-index 1030), otherwise
+   it covers the open menu and taps on menu links only close the menu */
+.nav-backdrop { z-index: 1025; }

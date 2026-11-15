@@ -56,7 +56,12 @@ $active  = fn(string $file) => $current === $file ? ' class="active"' : '';
           <?php endif; ?>
         <?php endif; ?>
         <?php if ($user): ?>
-          <li><a href="<?= url('logout.php') ?>">Log out</a></li>
+          <li>
+            <form method="post" action="<?= url('logout.php') ?>" class="logout-form">
+              <?= csrfField() ?>
+              <button type="submit" class="nav-link-button">Log out</button>
+            </form>
+          </li>
         <?php else: ?>
           <li><a href="<?= url('login.php') ?>"<?= $active('login.php') ?>>Log in</a></li>
           <li><a href="<?= url('register.php') ?>"<?= $active('register.php') ?>>Register</a></li>

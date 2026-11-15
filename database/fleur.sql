@@ -130,8 +130,8 @@ CREATE TABLE newsletter_subscribers (
 -- Admin login:    admin@fleur.test    / Admin@123
 -- Customer login: customer@fleur.test / Admin@123
 INSERT INTO users (full_name, email, password, phone, address, role) VALUES
-('Fleur Admin',   'admin@fleur.test',    '$2y$10$FlmNbTRXIvWT1g9R6ofoDuBMO2G9QqR4JK91KciEkRX7K7m9RIRYK', '0500000000', 'Riyadh', 'admin'),
-('Test Customer', 'customer@fleur.test', '$2y$10$FlmNbTRXIvWT1g9R6ofoDuBMO2G9QqR4JK91KciEkRX7K7m9RIRYK', '0511111111', 'Riyadh, Al Olaya', 'customer');
+('Fleur Admin',   'admin@fleur.test',    '$2y$10$hs.zr3e2h2YcprTc/1rtGOf20KYoD1eeONceKGTkD88UOfQJ8sm9O', '0500000000', 'Riyadh', 'admin'),
+('Test Customer', 'customer@fleur.test', '$2y$10$l7Vgd12AqkcT2ksU049xXOgJh7SXPKj/nO.pAGMBMZbIpSxTvjhrO', '0511111111', 'Riyadh, Al Olaya', 'customer');
 
 INSERT INTO occasions (name, slug) VALUES
 ('Birthday',     'birthday'),

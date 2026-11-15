@@ -41,7 +41,12 @@
         <ul>
           <?php if (isLoggedIn()): ?>
             <li><a href="<?= url('my-orders.php') ?>">My orders</a></li>
-            <li><a href="<?= url('logout.php') ?>">Log out</a></li>
+            <li>
+              <form method="post" action="<?= url('logout.php') ?>" class="logout-form">
+                <?= csrfField() ?>
+                <button type="submit" class="footer-link-button">Log out</button>
+              </form>
+            </li>
           <?php else: ?>
             <li><a href="<?= url('login.php') ?>">Log in</a></li>
             <li><a href="<?= url('register.php') ?>">Create an account</a></li>
