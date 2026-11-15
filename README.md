@@ -24,7 +24,8 @@ Fleur is a dynamic, database-driven online flower shop. Customers browse bouquet
 
 ### Customer
 - Home page with featured bouquets and occasion cards loaded from the database
-- Shop with occasion, colour and price filters, sorting, and links that open the shop pre-filtered (`shop.php?occasion=birthday`)
+- Shop with search (name and description), occasion, colour and price filters, sorting, and links that open the shop pre-filtered (`shop.php?occasion=birthday`)
+- Product details page with occasion, colour, stock and Add to cart
 - Slide-in cart updated with AJAX: add, change quantity, remove, live subtotal
 - Register, log in and log out
 - Checkout with recipient, phone, address, delivery date (tomorrow or later) and card message
@@ -47,7 +48,7 @@ Fleur is a dynamic, database-driven online flower shop. Customers browse bouquet
 Each item below is implemented in the code.
 
 - **SQL injection:** every query uses PDO prepared statements (`classes/Database.php`); ids are cast to integers
-- **Passwords:** stored with `password_hash()`, checked with `password_verify()`
+- **Passwords:** stored with `password_hash()`, checked with `password_verify()`; login pauses for 60 seconds after 5 wrong attempts in a session
 - **Sessions:** `session_regenerate_id()` after login; session cookie is HttpOnly and SameSite=Lax
 - **CSRF:** a token in every POST form and in the `X-CSRF-Token` header for AJAX
 - **XSS:** everything printed into HTML goes through `e()` (`htmlspecialchars`)
@@ -95,7 +96,8 @@ These are demo accounts for local testing only. Change or remove them before usi
 
 ```
 ├── index.php             Home page
-├── shop.php              Shop with filters and sorting
+├── shop.php              Shop with search, filters and sorting
+├── product.php           Product details
 ├── checkout.php          Delivery form, creates the order
 ├── my-orders.php         Customer order history
 ├── order-details.php     One order with its items
