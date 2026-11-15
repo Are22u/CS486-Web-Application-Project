@@ -1,11 +1,19 @@
 -- =========================================================
--- Fleur — Online Flower Shop
--- MySQL schema + sample data
--- Import in phpMyAdmin (XAMPP) or: mysql -u root < fleur.sql
+-- Fleur: Online Flower Shop
+-- MySQL / MariaDB schema and sample data
 --
--- Table and column names follow fleur_project_spec (all lowercase English).
--- Columns marked "extra" are not in the spec but are kept because
--- existing features (register, checkout, order details) use them.
+-- Import in phpMyAdmin (XAMPP): Import > choose this file > Go
+-- or from a terminal:            mysql -u root < fleur.sql
+--
+-- WARNING: this file starts with DROP DATABASE IF EXISTS fleur.
+-- Importing it deletes any existing database named "fleur"
+-- (and every order, user and product in it) and recreates it
+-- with the sample data below.
+--
+-- Prices are in Saudi Riyals (SAR).
+-- Demo accounts (password for both: Admin@123):
+--   admin@fleur.test     (admin)
+--   customer@fleur.test  (customer)
 -- =========================================================
 
 DROP DATABASE IF EXISTS fleur;
@@ -72,7 +80,9 @@ CREATE TABLE orders (
     delivery_date    DATE NOT NULL,                  -- extra (checkout form)
     notes            VARCHAR(255),                   -- extra (checkout form)
     CONSTRAINT fk_orders_user FOREIGN KEY (user_id)
-        REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT
+        REFERENCES users(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT chk_total CHECK (total >= 0),
+    INDEX idx_orders_status (status)                 -- admin filters orders by status
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------
@@ -89,7 +99,8 @@ CREATE TABLE order_items (
         REFERENCES orders(id) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT fk_items_product FOREIGN KEY (product_id)
         REFERENCES products(id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT chk_qty CHECK (quantity > 0)
+    CONSTRAINT chk_qty CHECK (quantity > 0),
+    CONSTRAINT chk_unit_price CHECK (unit_price >= 0)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------
@@ -130,32 +141,32 @@ INSERT INTO occasions (name, slug) VALUES
 ('Get Well',     'get-well'),
 ('Just Because', 'just-because');
 
--- The 14 bouquets from the template's shop.html
+-- 14 sample bouquets (prices in Saudi Riyals, SAR)
 INSERT INTO products (occasion_id, name, description, price, image, color, tag, stock) VALUES
-(1, 'Blush Peony Bloom',          'Ruffled peonies in every shade of pink with dusty miller.',            68.00, 'img/bouquet-peony.jpg',       'pink',   'Bestseller', 20),
-(2, 'Garden Rose & Eucalyptus',   'Fragrant garden roses with silver eucalyptus and waxflower.',          74.00, 'img/bouquet-garden-rose.jpg', 'pink',   NULL,         15),
-(6, 'Wild Meadow Bunch',          'A loose gathering of cornflowers, scabiosa and grasses.',              52.00, 'img/bouquet-meadow.jpg',      'mixed',  NULL,         25),
-(4, 'White Lily Serenity',        'Serene white oriental lilies and stock, gently scented.',              80.00, 'img/bouquet-lily.jpg',        'white',  NULL,         10),
-(5, 'Sunlit Ranunculus',          'Layered ranunculus in coral and butter yellow to lift spirits.',       58.00, 'img/bouquet-ranunculus.jpg',  'yellow', NULL,         18),
-(3, 'Bridal Ivory Cascade',       'A trailing cascade of ivory roses, ranunculus and amaranthus.',       145.00, 'img/bouquet-bridal.jpg',      'white',  'Bespoke',     5),
-(6, 'Dusk Tulip Trio',            'Three dozen tulips in dusky plum, lilac and cream.',                   46.00, 'img/bouquet-tulip.jpg',       'purple', NULL,         30),
-(5, 'Golden Freesia Basket',      'Sweetly scented freesia and mini sunflowers in a keepsake basket.',    62.00, 'img/bouquet-freesia.jpg',     'yellow', NULL,         12),
-(1, 'Velvet Dahlia',              'Show-stopping dahlias in burgundy and plum with copper foliage.',      72.00, 'img/bouquet-dahlia.jpg',      'red',    NULL,         14),
-(2, 'Classic Red Rose Dozen',     'Twelve long-stem red roses, the enduring way to say I love you.',      85.00, 'img/bouquet-red-rose.jpg',    'red',    'Bestseller', 40),
-(4, 'White Orchid Grace',         'A potted white phalaenopsis orchid, calm and long-lasting.',           95.00, 'img/bouquet-orchid.jpg',      'white',  NULL,          8),
-(6, 'Wildflower Jam Jar',         'A cheerful little posy in a reusable jam jar, ready for a windowsill.',38.00, 'img/bouquet-jamjar.jpg',      'mixed',  'Under $40',  35),
-(1, 'Coral Charm Posy',           'Coral peonies and pink ranunculus in a soft, romantic posy.',          54.00, 'img/bouquet-coral.jpg',       'pink',   NULL,         22),
-(3, 'Sage & Stock Bundle',        'Column stock and soft sage foliage, an airy neutral for any table.',   66.00, 'img/bouquet-stock.jpg',       'white',  NULL,         16);
+(1, 'Blush Peony Bloom',          'Ruffled peonies in every shade of pink with dusty miller.',            255.00, 'img/bouquet-peony.jpg',       'pink',   'Bestseller', 20),
+(2, 'Garden Rose & Eucalyptus',   'Fragrant garden roses with silver eucalyptus and waxflower.',          275.00, 'img/bouquet-garden-rose.jpg', 'pink',   NULL,         15),
+(6, 'Wild Meadow Bunch',          'A loose gathering of cornflowers, scabiosa and grasses.',              195.00, 'img/bouquet-meadow.jpg',      'mixed',  NULL,         25),
+(4, 'White Lily Serenity',        'Serene white oriental lilies and stock, gently scented.',              300.00, 'img/bouquet-lily.jpg',        'white',  NULL,         10),
+(5, 'Sunlit Ranunculus',          'Layered ranunculus in coral and butter yellow to lift spirits.',       215.00, 'img/bouquet-ranunculus.jpg',  'yellow', NULL,         18),
+(3, 'Bridal Ivory Cascade',       'A trailing cascade of ivory roses, ranunculus and amaranthus.',       545.00, 'img/bouquet-bridal.jpg',      'white',  'Bespoke',     5),
+(6, 'Dusk Tulip Trio',            'Three dozen tulips in dusky plum, lilac and cream.',                   175.00, 'img/bouquet-tulip.jpg',       'purple', NULL,         30),
+(5, 'Golden Freesia Basket',      'Sweetly scented freesia and mini sunflowers in a keepsake basket.',    235.00, 'img/bouquet-freesia.jpg',     'yellow', NULL,         12),
+(1, 'Velvet Dahlia',              'Show-stopping dahlias in burgundy and plum with copper foliage.',      270.00, 'img/bouquet-dahlia.jpg',      'red',    NULL,         14),
+(2, 'Classic Red Rose Dozen',     'Twelve long-stem red roses, the enduring way to say I love you.',      320.00, 'img/bouquet-red-rose.jpg',    'red',    'Bestseller', 40),
+(4, 'White Orchid Grace',         'A potted white phalaenopsis orchid, calm and long-lasting.',           355.00, 'img/bouquet-orchid.jpg',      'white',  NULL,          8),
+(6, 'Wildflower Jam Jar',         'A cheerful little posy in a reusable jam jar, ready for a windowsill.',145.00, 'img/bouquet-jamjar.jpg',      'mixed',  'Best value',  35),
+(1, 'Coral Charm Posy',           'Coral peonies and pink ranunculus in a soft, romantic posy.',          205.00, 'img/bouquet-coral.jpg',       'pink',   NULL,         22),
+(3, 'Sage & Stock Bundle',        'Column stock and soft sage foliage, an airy neutral for any table.',   250.00, 'img/bouquet-stock.jpg',       'white',  NULL,         16);
 
 -- One sample order so My Orders and the admin pages have data to show
 INSERT INTO orders (user_id, total, recipient_name, phone, delivery_address, delivery_date, notes, status) VALUES
-(2, 207.00, 'Test Customer', '0511111111', 'Riyadh, Al Olaya', '2026-11-15', 'Please call on arrival', 'pending');
+(2, 780.00, 'Test Customer', '0511111111', 'Riyadh, Al Olaya', '2026-11-20', 'Please call on arrival', 'pending');
 
 INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
-(1, 1,  1, 68.00),
-(1, 10, 1, 85.00),
-(1, 13, 1, 54.00);
--- 68 + 85 + 54 = 207.00 (matches orders.total)
+(1, 1,  1, 255.00),
+(1, 10, 1, 320.00),
+(1, 13, 1, 205.00);
+-- 255 + 320 + 205 = 780.00 SAR (matches orders.total)
 
 INSERT INTO contact_messages (name, email, message) VALUES
 ('Test Customer', 'customer@fleur.test', 'Do you deliver on Fridays?');
