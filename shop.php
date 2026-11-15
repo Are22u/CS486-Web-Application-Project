@@ -1,72 +1,24 @@
-
 <?php
 require_once __DIR__ . '/includes/init.php';
 
 $productModel = new Product();
 $products = $productModel->all();
+
+// ?occasion=birthday (from the homepage occasion cards) pre-ticks that filter
+$selectedOccasion = (string) ($_GET['occasion'] ?? '');
+
+$pageTitle       = 'Shop Bouquets';
+$pageDescription = 'Browse all Fleur bouquets and filter them by occasion, colour and price.';
+$fullWidth       = true;
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <script>document.documentElement.classList.add('js')</script>
-  <meta charset="utf-8">
-  <meta name="csrf-token" content="<?= e(csrfToken()) ?>">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Shop Bouquets &mdash; Fleur Florist</title>
-  <meta name="description" content="Browse the full Fleur bouquet shop.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
-<header>
-  <nav class="site-nav scrolled" aria-label="Primary">
-    <div class="container">
-      <a class="nav-brand" href="index.php">Fleur<span class="mark">.</span></a>
-
-      <ul class="nav-links" id="primary-menu">
-        <li><a href="shop.php" class="active">Shop</a></li>
-        <li><a href="index.php#occasions">Occasions</a></li>
-        <li><a href="index.php#subscription">Subscriptions</a></li>
-        <li><a href="index.php#story">Our Story</a></li>
-        <li><a href="index.php#services">Services</a></li>
-        <li><a href="index.php#delivery">Delivery</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <button type="button" class="cart-pill" data-cart-open aria-label="Open shopping bag">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-            <path d="M3 6h18"/>
-            <path d="M16 10a4 4 0 0 1-8 0"/>
-          </svg>
-          <span>Bag</span>
-          <span class="cart-count" aria-live="polite">0</span>
-        </button>
-
-        <a href="index.php" class="btn btn-rose btn-sm d-none d-lg-inline-flex">Home</a>
-
-        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="Toggle menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-  </nav>
-  <div class="nav-backdrop" aria-hidden="true"></div>
-</header>
-
-<main>
   <section class="page-head">
     <div class="container">
       <p class="breadcrumb-line"><a href="index.php">Home</a> &nbsp;/&nbsp; Shop</p>
       <h1>The Bouquet Shop</h1>
       <p class="section-lead" style="margin:1rem auto 0">
-        Every bouquet is tied by hand the morning it ships. Filter by occasion, colour or price to find the one.
+        Filter by occasion, colour or price, sort the results, and add bouquets to your cart.
       </p>
     </div>
   </section>
@@ -86,17 +38,17 @@ $products = $productModel->all();
           </div>
 
           <div class="filter-group">
-            <h4>Occasion</h4>
-            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="birthday"> Birthday</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="anniversary"> Anniversary</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="wedding"> Wedding</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="sympathy"> Sympathy</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="get-well"> Get Well</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="just-because"> Just Because</label>
+            <h2 class="h4">Occasion</h2>
+            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="birthday"<?= $selectedOccasion === 'birthday' ? ' checked' : '' ?>> Birthday</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="anniversary"<?= $selectedOccasion === 'anniversary' ? ' checked' : '' ?>> Anniversary</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="wedding"<?= $selectedOccasion === 'wedding' ? ' checked' : '' ?>> Wedding</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="sympathy"<?= $selectedOccasion === 'sympathy' ? ' checked' : '' ?>> Sympathy</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="get-well"<?= $selectedOccasion === 'get-well' ? ' checked' : '' ?>> Get Well</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-occasion value="just-because"<?= $selectedOccasion === 'just-because' ? ' checked' : '' ?>> Just Because</label>
           </div>
 
           <div class="filter-group">
-            <h4>Colour</h4>
+            <h2 class="h4">Colour</h2>
             <label class="filter-opt"><input type="checkbox" data-shop-color value="pink"> <span class="swatch" style="background:#E8A9B6"></span> Pink</label>
             <label class="filter-opt"><input type="checkbox" data-shop-color value="red"> <span class="swatch" style="background:#A8323F"></span> Red</label>
             <label class="filter-opt"><input type="checkbox" data-shop-color value="white"> <span class="swatch" style="background:#F3EEE8"></span> White &amp; Ivory</label>
@@ -106,11 +58,11 @@ $products = $productModel->all();
           </div>
 
           <div class="filter-group">
-            <h4>Price</h4>
-            <label class="filter-opt"><input type="checkbox" data-shop-price value="0-50"> Under $50</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-price value="50-75"> $50 – $75</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-price value="75-100"> $75 – $100</label>
-            <label class="filter-opt"><input type="checkbox" data-shop-price value="100-plus"> $100 &amp; up</label>
+            <h2 class="h4">Price</h2>
+            <label class="filter-opt"><input type="checkbox" data-shop-price value="0-199"> Under SAR 200</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-price value="200-299"> SAR 200 to 299</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-price value="300-399"> SAR 300 to 399</label>
+            <label class="filter-opt"><input type="checkbox" data-shop-price value="400-plus"> SAR 400 and up</label>
           </div>
 
           <button type="button" class="btn btn-ghost btn-block" data-shop-clear>Clear all filters</button>
@@ -138,6 +90,7 @@ $products = $productModel->all();
             </label>
           </div>
 
+          <h2 class="visually-hidden">Bouquets</h2>
           <div class="product-grid cols-3" data-shop-grid>
             <?php foreach ($products as $index => $product): ?>
               <?php
@@ -194,7 +147,7 @@ $products = $productModel->all();
               </article>
             <?php endforeach; ?>
 
-            <p class="empty-note" hidden>No bouquets match those filters — try clearing a few.</p>
+            <p class="empty-note" hidden>No bouquets match those filters. Try clearing a few.</p>
           </div>
         </div>
       </div>
@@ -204,9 +157,9 @@ $products = $productModel->all();
   <section class="section-sm">
     <div class="container">
       <div class="newsletter reveal">
-        <span class="eyebrow center" style="color:rgba(255,255,255,.85)">Join the List</span>
-        <h2>Bloom notes in your inbox</h2>
-        <p>What's in season, care tips, and the occasional subscriber-only bunch. One gentle email a week — no more.</p>
+        <span class="eyebrow center" style="color:rgba(255,255,255,.85)">Newsletter</span>
+        <h2>New bouquets in your inbox</h2>
+        <p>Subscribe to hear about new bouquets and seasonal picks.</p>
 
         <form class="news-form" data-validate novalidate>
           <label for="news-email" class="visually-hidden">Email address</label>
@@ -217,98 +170,5 @@ $products = $productModel->all();
       </div>
     </div>
   </section>
-</main>
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-col">
-        <a href="index.php" class="footer-brand">Fleur<span class="mark">.</span></a>
-        <p>A small flower studio on Rowan Hill, tying seasonal bouquets by hand and delivering them across the city the same day.</p>
-        <div class="social-row">
-          <a href="#" aria-label="Fleur on Instagram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
-              <rect x="2" y="2" width="20" height="20" rx="5"/>
-              <circle cx="12" cy="12" r="4"/>
-              <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
-            </svg>
-          </a>
-          <a href="#" aria-label="Fleur on Pinterest">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M8.5 20c1-3 2.5-8 2.5-8m0 0c-.4-1 0-2.5 1.5-2.5s2 1.3 1.6 3c-.4 2-2 3-3.1 2.5"/>
-            </svg>
-          </a>
-          <a href="#" aria-label="Fleur on Facebook">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
-              <path d="M15 3h-3a4 4 0 0 0-4 4v3H5v4h3v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-
-      <div class="footer-col">
-        <h5>Shop</h5>
-        <ul>
-          <li><a href="shop.php">All bouquets</a></li>
-          <li><a href="shop.php">Birthday</a></li>
-          <li><a href="shop.php">Weddings</a></li>
-          <li><a href="index.php#subscription">Subscriptions</a></li>
-          <li><a href="shop.php">Sympathy</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h5>Studio</h5>
-        <ul>
-          <li><a href="index.php#story">Our story</a></li>
-          <li><a href="index.php#services">Services</a></li>
-          <li><a href="index.php#gallery">Gallery</a></li>
-          <li><a href="index.php#delivery">Delivery areas</a></li>
-          <li><a href="index.php#reviews">Reviews</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h5>Visit Us</h5>
-        <ul class="footer-contact">
-          <li>14 Rowan Hill Lane, Old Town</li>
-          <li>(555) 0142 — 3390</li>
-          <li>hello@fleur-studio.example</li>
-          <li>Tue–Sun, 9am–6pm</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <span>&copy; 2026 Fleur Flower Studio. Built on Bootstrap 5.</span>
-      <span><a href="#">Privacy</a> &middot; <a href="#">Terms</a> &middot; <a href="#">Care Guide</a></span>
-    </div>
-  </div>
-</footer>
-
-<div class="cart-overlay" aria-hidden="true"></div>
-<aside class="cart-drawer" aria-hidden="true" aria-label="Shopping bag" role="dialog" aria-modal="true">
-  <div class="cart-head">
-    <h3>Your Bag</h3>
-    <button type="button" class="cart-close" aria-label="Close bag">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M18 6 6 18M6 6l12 12"/>
-      </svg>
-    </button>
-  </div>
-  <div class="cart-items"></div>
-  <div class="cart-foot">
-    <div class="cart-total">
-      <span class="lbl">Subtotal</span>
-      <span class="amt" data-cart-total>$0.00</span>
-    </div>
-    <p class="cart-note">Delivery calculated at checkout. Free within 5 miles.</p>
-    <a href="checkout.php" class="btn btn-rose btn-block">Checkout</a>
-  </div>
-</aside>
-
-<script src="js/vendor/bootstrap.bundle.min.js"></script>
-<script src="js/main.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/includes/footer.php'; ?>

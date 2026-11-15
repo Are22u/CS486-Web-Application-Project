@@ -1,5 +1,5 @@
 /* =====================================================================
-   Fleur — vanilla JavaScript (no jQuery, no plugins)
+   Fleur: vanilla JavaScript (no jQuery, no plugins)
    One function per feature. Guard clauses. Reduced-motion aware.
    ===================================================================== */
 (function () {
@@ -9,7 +9,7 @@
   // Site root, set by includes/footer.php (e.g. "/Web-project/") so AJAX and
   // image paths also work from pages inside admin/. Empty on static pages.
   var BASE = window.FLEUR_BASE || "";
-  var money = function (n) { return "$" + n.toFixed(2); };
+  var money = function (n) { return "SAR " + n.toFixed(2); };
 
   /* ---------------------------------------------------------- Sticky nav */
   function initStickyNav() {
@@ -132,7 +132,7 @@
     var csrf = csrfMeta ? csrfMeta.content : "";
     var checkoutLink = drawer.querySelector(".cart-foot a");
     if (checkoutLink) checkoutLink.href = BASE + "checkout.php";
-    var money = function (n) { return "$" + Number(n || 0).toFixed(2); };
+    var money = function (n) { return "SAR " + Number(n || 0).toFixed(2); };
     var escapeHtml = function (value) {
       return String(value == null ? "" : value).replace(/[&<>"']/g, function (c) {
         return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c];
@@ -191,7 +191,24 @@
       render();
       showCartMessage(res && res.message ? res.message : "", !res || !res.success);
     };
+    // Requests are queued so they reach the server one at a time, in click order,
+    // and the drawer shows a loading state while one is in progress.
+    var queue = Promise.resolve();
+    var pending = 0;
+    var setBusy = function (busy) {
+      drawer.setAttribute("aria-busy", busy ? "true" : "false");
+      drawer.classList.toggle("is-busy", busy);
+    };
     var cartRequest = function (data) {
+      pending += 1; setBusy(true);
+      var run = queue.then(function () { return sendCartRequest(data); });
+      queue = run.then(function () {}, function () {});
+      return run.then(function (res) {
+        pending -= 1; if (!pending) setBusy(false);
+        return res;
+      });
+    };
+    var sendCartRequest = function (data) {
       if (!csrf) {
         showCartMessage("Security token is missing. Please refresh the page.", true);
         return Promise.resolve(null);
@@ -224,7 +241,10 @@
           open();
           return;
         }
+        if (button.disabled) return;
+        button.disabled = true;                       // no double "Add" while the request runs
         cartRequest({ action: "add", product_id: id, qty: 1 }).then(function (res) {
+          button.disabled = false;
           if (res && res.success) open();
           var label = button.querySelector(".add-label");
           if (res && res.success && label) {
@@ -367,6 +387,8 @@
       Array.prototype.slice.call(list).forEach(function (i) { i.addEventListener("change", apply); });
     });
     if (sortSel) sortSel.addEventListener("change", sortCards);
+    // Filters pre-ticked by the server (e.g. shop.php?occasion=birthday) apply straight away
+    if (checked(occInputs).length || checked(colInputs).length || checked(priceInputs).length) apply();
 
     var clearBtn = document.querySelector("[data-shop-clear]");
     if (clearBtn) clearBtn.addEventListener("click", function () {
@@ -429,7 +451,7 @@
       return valid;
     };
 
-    ["register-form", "login-form", "checkout-form", "product-form"].forEach(function (id) {
+    ["register-form", "login-form", "checkout-form", "product-form", "contact-form"].forEach(function (id) {
       var form = document.getElementById(id);
       if (!form) return;
       form.querySelectorAll("input, select, textarea").forEach(function (input) {
@@ -437,7 +459,13 @@
         input.addEventListener("change", function () { setError(input, ""); });
       });
       form.addEventListener("submit", function (event) {
-        if (!validateForm(form)) event.preventDefault();
+        if (!validateForm(form)) { event.preventDefault(); return; }
+        // Valid: lock the submit button so a double click can't send the form twice
+        var submit = form.querySelector('[type="submit"]');
+        if (submit) {
+          if (submit.disabled) { event.preventDefault(); return; }
+          window.setTimeout(function () { submit.disabled = true; submit.setAttribute("aria-busy", "true"); }, 0);
+        }
       });
     });
 

@@ -1,97 +1,54 @@
 <?php
 require_once __DIR__ . '/includes/init.php';
 
-// Featured bouquets for the homepage grid come from the database
-$featured = (new Product())->featured(8);
+$productModel = new Product();
+$featured     = $productModel->featured(8);          // featured bouquets come from the database
+$fromPrice    = $productModel->minPriceByOccasion();  // "From SAR ..." on each occasion card
+$productCount = $productModel->count();
+
+$pageTitle       = 'Online Flower Shop';
+$pageDescription = 'Fleur is an online flower shop: browse bouquets by occasion, add them to your cart and choose a delivery date at checkout.';
+$fullWidth       = true;                              // homepage sections span the full width
+require __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <script>document.documentElement.classList.add('js')</script>
-  <meta charset="utf-8">
-  <meta name="csrf-token" content="<?= e(csrfToken()) ?>">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fleur &mdash; Florist &amp; Flower Shop Bootstrap 5 Template</title>
-  <meta name="description" content="Fleur is a free, elegant Bootstrap 5 website template for florists and flower shops — with an online bouquet shop, subscription tiers, gallery, and slide-in cart. jQuery-free.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="css/vendor/bootstrap.min.css">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-
-  <!-- ============================================================ NAV -->
-  <header>
-    <nav class="site-nav" aria-label="Primary">
-      <div class="container">
-        <a class="nav-brand" href="index.php">Fleur<span class="mark">.</span></a>
-
-        <ul class="nav-links" id="primary-menu">
-          <li><a href="#shop">Shop</a></li>
-          <li><a href="#occasions">Occasions</a></li>
-          <li><a href="#subscription">Subscriptions</a></li>
-          <li><a href="#story">Our Story</a></li>
-          <li><a href="#services">Services</a></li>
-          <li><a href="#delivery">Delivery</a></li>
-        </ul>
-
-        <div class="nav-actions">
-          <button type="button" class="cart-pill" data-cart-open aria-label="Open shopping bag">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            <span>Bag</span>
-            <span class="cart-count" aria-live="polite">0</span>
-          </button>
-          <a href="shop.php" class="btn btn-rose btn-sm d-none d-lg-inline-flex">Shop Flowers</a>
-          <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="Toggle menu">
-            <span></span><span></span><span></span>
-          </button>
-        </div>
-      </div>
-    </nav>
-    <div class="nav-backdrop" aria-hidden="true"></div>
-  </header>
-
-  <main>
-    <!-- ========================================================= HERO -->
+    <!-- ======================================================== HERO -->
     <section class="hero" id="home">
       <div class="container">
         <div class="hero-grid">
           <div class="hero-copy">
-            <span class="eyebrow">Rowan Hill Flower Studio</span>
-            <h1>Fresh flowers, <em>gathered</em> by hand each morning</h1>
-            <p class="hero-lead">Seasonal bouquets designed in our little corner shop and delivered across the city the same day. Grown well, wrapped beautifully, and always in bloom.</p>
+            <span class="eyebrow">Fleur Online Flower Shop</span>
+            <h1>Fresh flowers for <em>every</em> occasion</h1>
+            <p class="hero-lead">Browse hand-tied bouquets for birthdays, weddings, anniversaries and more. Add your favourites to the cart, choose a delivery date, and follow your order online.</p>
             <div class="hero-cta">
               <a href="shop.php" class="btn btn-rose">Shop Bouquets</a>
-              <a href="#subscription" class="btn btn-outline">Weekly Subscription</a>
+              <a href="#occasions" class="btn btn-outline">Shop by Occasion</a>
             </div>
             <div class="hero-meta">
               <div>
-                <div class="num"><span data-count="14">14</span></div>
-                <div class="lbl">Years in bloom</div>
+                <div class="num"><span data-count="<?= $productCount ?>"><?= $productCount ?></span></div>
+                <div class="lbl">Bouquets in the shop</div>
               </div>
               <div>
-                <div class="num"><span data-count="60" data-suffix="+">60+</span></div>
-                <div class="lbl">Seasonal stems</div>
+                <div class="num"><span data-count="<?= count($fromPrice) ?>"><?= count($fromPrice) ?></span></div>
+                <div class="lbl">Occasions</div>
               </div>
               <div>
-                <div class="num">3&nbsp;hr</div>
-                <div class="lbl">Same-day cutoff</div>
+                <div class="num">24/7</div>
+                <div class="lbl">Online ordering</div>
               </div>
             </div>
           </div>
 
           <div class="hero-figure">
-            <img src="img/hero-bouquet.jpg" alt="A hand-tied bouquet of blush peonies and garden roses wrapped in cream paper" width="720" height="900" fetchpriority="high">
+            <img src="img/hero-bouquet.jpg" alt="Bright orange poppies in a sunny field" width="720" height="900" fetchpriority="high">
             <div class="hero-badge">
               <span class="dot" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2s4 4 4 9a4 4 0 0 1-8 0c0-5 4-9 4-9z"/><path d="M12 22v-7"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
               </span>
               <div>
-                <strong>Cut this morning</strong>
-                <span>Farm-fresh, never from a warehouse</span>
+                <strong>You pick the day</strong>
+                <span>Choose your delivery date at checkout</span>
               </div>
             </div>
           </div>
@@ -99,55 +56,55 @@ $featured = (new Product())->featured(8);
       </div>
     </section>
 
-    <!-- ==================================================== OCCASIONS -->
+    <!-- =================================================== OCCASIONS -->
     <section class="section bg-cream2" id="occasions">
       <div class="container">
         <div class="text-center reveal">
           <span class="eyebrow center">Shop by Occasion</span>
           <h2 class="section-title">A bouquet for every moment</h2>
-          <p class="section-lead">Tell us the occasion and we will match the blooms, the palette, and the note to the feeling.</p>
+          <p class="section-lead">Browse bouquets grouped by occasion, then filter by colour and price in the shop.</p>
         </div>
 
         <div class="occasion-grid" style="margin-top:3rem">
-          <a class="occasion-card reveal" href="shop.php">
-            <img src="img/occasion-birthday.jpg" alt="Bright birthday bouquet of gerberas and ranunculus" width="360" height="480" loading="lazy">
+          <a class="occasion-card reveal" href="shop.php?occasion=birthday">
+            <img src="img/occasion-birthday.jpg" alt="Heart-shaped bouquet of pink roses and yellow flowers held in two hands" width="360" height="480" loading="lazy">
             <div class="oc-body">
-              <span>From $46</span>
+              <span><?= isset($fromPrice['birthday']) ? 'From ' . money($fromPrice['birthday']) : 'Coming soon' ?></span>
               <h3>Birthday</h3>
             </div>
           </a>
-          <a class="occasion-card reveal d1" href="shop.php">
-            <img src="img/occasion-wedding.jpg" alt="Ivory and white bridal bouquet with trailing greenery" width="360" height="480" loading="lazy">
+          <a class="occasion-card reveal d1" href="shop.php?occasion=wedding">
+            <img src="img/occasion-wedding.jpg" alt="Flower stand with buckets of fresh flowers and potted plants" width="360" height="480" loading="lazy">
             <div class="oc-body">
-              <span>Bespoke</span>
+              <span><?= isset($fromPrice['wedding']) ? 'From ' . money($fromPrice['wedding']) : 'Coming soon' ?></span>
               <h3>Wedding</h3>
             </div>
           </a>
-          <a class="occasion-card reveal d2" href="shop.php">
-            <img src="img/occasion-sympathy.jpg" alt="White lily and chrysanthemum sympathy arrangement" width="360" height="480" loading="lazy">
+          <a class="occasion-card reveal d2" href="shop.php?occasion=sympathy">
+            <img src="img/occasion-sympathy.jpg" alt="Bunch of multicoloured roses" width="360" height="480" loading="lazy">
             <div class="oc-body">
-              <span>From $80</span>
+              <span><?= isset($fromPrice['sympathy']) ? 'From ' . money($fromPrice['sympathy']) : 'Coming soon' ?></span>
               <h3>Sympathy</h3>
             </div>
           </a>
-          <a class="occasion-card reveal" href="shop.php">
-            <img src="img/occasion-anniversary.jpg" alt="Romantic red rose anniversary bouquet" width="360" height="480" loading="lazy">
+          <a class="occasion-card reveal" href="shop.php?occasion=anniversary">
+            <img src="img/occasion-anniversary.jpg" alt="Close-up of red roses" width="360" height="480" loading="lazy">
             <div class="oc-body">
-              <span>From $74</span>
+              <span><?= isset($fromPrice['anniversary']) ? 'From ' . money($fromPrice['anniversary']) : 'Coming soon' ?></span>
               <h3>Anniversary</h3>
             </div>
           </a>
-          <a class="occasion-card reveal d1" href="shop.php">
-            <img src="img/occasion-getwell.jpg" alt="Cheerful get-well basket of yellow freesia and sunflowers" width="360" height="480" loading="lazy">
+          <a class="occasion-card reveal d1" href="shop.php?occasion=get-well">
+            <img src="img/occasion-getwell.jpg" alt="A tall sunflower in bloom" width="360" height="480" loading="lazy">
             <div class="oc-body">
-              <span>From $58</span>
+              <span><?= isset($fromPrice['get-well']) ? 'From ' . money($fromPrice['get-well']) : 'Coming soon' ?></span>
               <h3>Get Well</h3>
             </div>
           </a>
-          <a class="occasion-card reveal d2" href="shop.php">
-            <img src="img/occasion-justbecause.jpg" alt="Casual wildflower posy tied with twine" width="360" height="480" loading="lazy">
+          <a class="occasion-card reveal d2" href="shop.php?occasion=just-because">
+            <img src="img/occasion-justbecause.jpg" alt="Pink blossoms against a blue sky" width="360" height="480" loading="lazy">
             <div class="oc-body">
-              <span>From $38</span>
+              <span><?= isset($fromPrice['just-because']) ? 'From ' . money($fromPrice['just-because']) : 'Coming soon' ?></span>
               <h3>Just Because</h3>
             </div>
           </a>
@@ -155,7 +112,7 @@ $featured = (new Product())->featured(8);
       </div>
     </section>
 
-    <!-- ============================================ FEATURED BOUQUETS -->
+    <!-- ==================================================== FEATURED -->
     <section class="section" id="shop">
       <div class="container">
         <div class="text-center reveal">
@@ -202,87 +159,30 @@ $featured = (new Product())->featured(8);
       </div>
     </section>
 
-    <!-- ================================================= SUBSCRIPTION -->
-    <section class="section subscribe-band" id="subscription">
-      <div class="container">
-        <div class="text-center reveal">
-          <span class="eyebrow center">Weekly Flower Subscription</span>
-          <h2 class="section-title">Fresh flowers, delivered on repeat</h2>
-          <p class="section-lead">Choose a size, pick a day, and we handle the rest — a new seasonal design at your door every week. Pause or cancel anytime.</p>
-        </div>
-
-        <div class="tier-grid">
-          <div class="tier-card reveal">
-            <h3>The Posy</h3>
-            <p class="tier-sub">A petite hand-tied bunch</p>
-            <div class="tier-price">$35<small>/week</small></div>
-            <ul class="tier-list">
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> 10–12 seasonal stems</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Wrapped in kraft &amp; twine</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Perfect for a desk or nook</li>
-            </ul>
-            <a href="shop.php" class="btn btn-ghost btn-block" style="color:#fff;border-color:rgba(255,255,255,.35)">Start The Posy</a>
-          </div>
-
-          <div class="tier-card featured reveal d1">
-            <span class="tier-flag">Most Loved</span>
-            <h3>The Bouquet</h3>
-            <p class="tier-sub">Our signature weekly size</p>
-            <div class="tier-price">$55<small>/week</small></div>
-            <ul class="tier-list">
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> 18–22 stems, full &amp; lush</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Feature blooms each week</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Care card &amp; flower food</li>
-            </ul>
-            <a href="shop.php" class="btn btn-rose btn-block">Start The Bouquet</a>
-          </div>
-
-          <div class="tier-card reveal d2">
-            <h3>The Statement</h3>
-            <p class="tier-sub">A generous designer arrangement</p>
-            <div class="tier-price">$90<small>/week</small></div>
-            <ul class="tier-list">
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> 30+ premium stems</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Vase-ready, styled to fill a room</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg> Priority florist's choice</li>
-            </ul>
-            <a href="shop.php" class="btn btn-ghost btn-block" style="color:#fff;border-color:rgba(255,255,255,.35)">Start The Statement</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ======================================================= STORY -->
+    <!-- ======================================================= ABOUT -->
     <section class="section" id="story">
       <div class="container">
         <div class="story-grid">
           <div class="story-figure reveal">
-            <img src="img/story-studio.jpg" alt="Florist arranging flowers on a wooden workbench inside the Fleur studio" width="560" height="672" loading="lazy">
-            <div class="stamp">
-              <div><b>Est.</b><span>2012</span></div>
-            </div>
+            <img src="img/story-studio.jpg" alt="Heart-shaped bouquet of roses held in two hands" width="560" height="672" loading="lazy">
           </div>
           <div class="reveal d1">
-            <span class="eyebrow">Our Story</span>
-            <h2 class="section-title">A small studio with a big love of flowers</h2>
-            <p>Fleur began as a market stall on Rowan Hill with a single galvanised bucket and a stubborn belief that flowers should be grown well and priced kindly. Fourteen years on, we still cut most of our stems from local growers within a day's drive, and we still tie every bouquet by hand.</p>
-            <p>We are a two-person studio at heart — no warehouse, no cold-storage roses flown in from the other side of the world. Just what is beautiful and in season, arranged the way we would want to receive it ourselves.</p>
-            <div class="signature">
-              Marguerite &amp; Elias
-              <small>Founders &amp; head florists</small>
-            </div>
+            <span class="eyebrow">About Fleur</span>
+            <h2 class="section-title">Flowers, ordered the easy way</h2>
+            <p>Fleur is an online flower shop built for customers who want to send flowers without visiting a physical store. Every bouquet in the shop shows its price, occasion, colour and available stock, so it is easy to find the right one.</p>
+            <p>Customers create an account, add bouquets to their cart, and check out with the recipient's details, a delivery date and an optional card message. After ordering, they can follow each order's status from the My Orders page.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ==================================================== SERVICES -->
+    <!-- ================================================ HOW IT WORKS -->
     <section class="section bg-blush" id="services">
       <div class="container">
         <div class="text-center reveal">
-          <span class="eyebrow center">What We Do</span>
-          <h2 class="section-title">More than a bunch of flowers</h2>
-          <p class="section-lead">From a single stem to a whole ballroom, we bring the same care to every arrangement.</p>
+          <span class="eyebrow center">How It Works</span>
+          <h2 class="section-title">Three steps to send flowers</h2>
+          <p class="section-lead">From choosing a bouquet to following the delivery, everything happens on the website.</p>
         </div>
 
         <div class="service-grid" style="margin-top:3rem">
@@ -290,27 +190,27 @@ $featured = (new Product())->featured(8);
             <div class="service-icon" aria-hidden="true">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2s3.5 3.5 3.5 7a3.5 3.5 0 0 1-7 0C8.5 5.5 12 2 12 2z"/><path d="M5 13c2 0 4 1 4 4M19 13c-2 0-4 1-4 4M12 22v-5"/></svg>
             </div>
-            <h3>Weddings &amp; Events</h3>
-            <p>Bouquets, buttonholes, arches and table designs, planned with you from mood board to the moment you walk down the aisle.</p>
-            <a href="shop.php" class="link-arrow">Enquire <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <h3>1. Choose a bouquet</h3>
+            <p>Filter the shop by occasion, colour and price, sort the results, and add bouquets to your cart.</p>
+            <a href="shop.php" class="link-arrow">Go to the shop <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           </div>
 
           <div class="service-card reveal d1">
             <div class="service-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="6" width="15" height="11" rx="1.5"/><path d="M16 9h4l3 3v5h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             </div>
-            <h3>Same-Day Delivery</h3>
-            <p>Order before 2pm and we hand-deliver across the city the same afternoon, carried upright and kept cool the whole way.</p>
-            <a href="shop.php" class="link-arrow">Send flowers <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <h3>2. Check out</h3>
+            <p>Enter the recipient's name, phone and address, pick a delivery date from tomorrow onwards, and add a card message.</p>
+            <a href="checkout.php" class="link-arrow">Checkout <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           </div>
 
           <div class="service-card reveal d2">
             <div class="service-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-6h6v6M3 11h18"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </div>
-            <h3>Corporate &amp; Subscriptions</h3>
-            <p>Weekly blooms for reception desks, restaurants and studios, invoiced monthly with a florist who knows your space.</p>
-            <a href="#subscription" class="link-arrow">See plans <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <h3>3. Follow your order</h3>
+            <p>See every order you placed with its items, total and current status, from pending to delivered.</p>
+            <a href="my-orders.php" class="link-arrow">My Orders <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           </div>
         </div>
       </div>
@@ -320,126 +220,83 @@ $featured = (new Product())->featured(8);
     <section class="section" id="gallery">
       <div class="container">
         <div class="text-center reveal">
-          <span class="eyebrow center">From the Studio</span>
+          <span class="eyebrow center">Gallery</span>
           <h2 class="section-title">Arrangement gallery</h2>
-          <p class="section-lead">A look at recent bouquets, installations and weddings. Tap any image to view it larger.</p>
+          <p class="section-lead">Arrangement ideas for different occasions. Select any image to view it larger.</p>
         </div>
 
         <div class="gallery-grid" style="margin-top:3rem">
-          <button type="button" class="gallery-item tall reveal" data-lightbox data-full="img/gallery-01.jpg" data-caption="Blush and burgundy bridal bouquet">
-            <img src="img/gallery-01.jpg" alt="Blush and burgundy bridal bouquet held by a bride" width="300" height="400" loading="lazy">
+          <button type="button" class="gallery-item tall reveal" data-lightbox data-full="img/gallery-01.jpg" data-caption="Flower stand with buckets of fresh flowers">
+            <img src="img/gallery-01.jpg" alt="Flower stand with buckets of fresh flowers" width="300" height="400" loading="lazy">
             <span class="zoom" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4M11 8v6M8 11h6"/></svg></span>
           </button>
-          <button type="button" class="gallery-item reveal d1" data-lightbox data-full="img/gallery-02.jpg" data-caption="Table runner of garden roses and candles">
-            <img src="img/gallery-02.jpg" alt="Wedding table runner of garden roses and taper candles" width="300" height="200" loading="lazy">
+          <button type="button" class="gallery-item reveal d1" data-lightbox data-full="img/gallery-02.jpg" data-caption="Multicoloured roses">
+            <img src="img/gallery-02.jpg" alt="Bunch of multicoloured roses" width="300" height="200" loading="lazy">
             <span class="zoom" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4M11 8v6M8 11h6"/></svg></span>
           </button>
-          <button type="button" class="gallery-item wide reveal d2" data-lightbox data-full="img/gallery-03.jpg" data-caption="Spring installation above the studio counter">
-            <img src="img/gallery-03.jpg" alt="Hanging spring flower installation above the studio counter" width="600" height="200" loading="lazy">
+          <button type="button" class="gallery-item wide reveal d2" data-lightbox data-full="img/gallery-03.jpg" data-caption="Orange poppies">
+            <img src="img/gallery-03.jpg" alt="Orange poppies in a sunny field" width="600" height="200" loading="lazy">
             <span class="zoom" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4M11 8v6M8 11h6"/></svg></span>
           </button>
-          <button type="button" class="gallery-item reveal" data-lightbox data-full="img/gallery-04.jpg" data-caption="Buckets of tulips ready for market">
-            <img src="img/gallery-04.jpg" alt="Galvanised buckets full of fresh tulips ready for market" width="300" height="200" loading="lazy">
+          <button type="button" class="gallery-item reveal" data-lightbox data-full="img/gallery-04.jpg" data-caption="Sunflowers">
+            <img src="img/gallery-04.jpg" alt="Field of sunflowers" width="300" height="200" loading="lazy">
             <span class="zoom" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4M11 8v6M8 11h6"/></svg></span>
           </button>
-          <button type="button" class="gallery-item reveal d1" data-lightbox data-full="img/gallery-05.jpg" data-caption="Dried flower wreath on a studio door">
-            <img src="img/gallery-05.jpg" alt="Dried flower wreath hanging on the studio door" width="300" height="200" loading="lazy">
+          <button type="button" class="gallery-item reveal d1" data-lightbox data-full="img/gallery-05.jpg" data-caption="Red roses">
+            <img src="img/gallery-05.jpg" alt="Close-up of red roses" width="300" height="200" loading="lazy">
             <span class="zoom" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4M11 8v6M8 11h6"/></svg></span>
           </button>
-          <button type="button" class="gallery-item tall reveal d2" data-lightbox data-full="img/gallery-06.jpg" data-caption="Florist wrapping a bouquet in paper">
-            <img src="img/gallery-06.jpg" alt="Florist wrapping a finished bouquet in cream paper" width="300" height="400" loading="lazy">
+          <button type="button" class="gallery-item tall reveal d2" data-lightbox data-full="img/gallery-06.jpg" data-caption="Orange roses and snapdragons">
+            <img src="img/gallery-06.jpg" alt="Bouquet of orange roses and snapdragons in a glass jar" width="300" height="400" loading="lazy">
             <span class="zoom" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4M11 8v6M8 11h6"/></svg></span>
           </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================================================ TESTIMONIALS -->
-    <section class="section bg-cream2" id="reviews">
-      <div class="container">
-        <div class="text-center reveal">
-          <span class="eyebrow center">Kind Words</span>
-          <h2 class="section-title">Loved by our neighbours</h2>
-        </div>
-
-        <div class="quote-grid" style="margin-top:3rem">
-          <figure class="quote-card reveal">
-            <div class="stars" aria-label="Rated 5 out of 5">★★★★★</div>
-            <blockquote>The peonies arrived looking like they were still in the garden. My mum cried. Best florist in the city, no contest.</blockquote>
-            <figcaption class="quote-author">
-              <img src="img/customer-anna.jpg" alt="Anna Whitfield" width="50" height="50" loading="lazy">
-              <div><b>Anna Whitfield</b><span>Birthday delivery</span></div>
-            </figcaption>
-          </figure>
-
-          <figure class="quote-card reveal d1">
-            <div class="stars" aria-label="Rated 5 out of 5">★★★★★</div>
-            <blockquote>Marguerite designed our whole wedding — arch, bouquets, tables. It was more beautiful than the picture in my head.</blockquote>
-            <figcaption class="quote-author">
-              <img src="img/customer-priya.jpg" alt="Priya Nair" width="50" height="50" loading="lazy">
-              <div><b>Priya Nair</b><span>Wedding client</span></div>
-            </figcaption>
-          </figure>
-
-          <figure class="quote-card reveal d2">
-            <div class="stars" aria-label="Rated 5 out of 5">★★★★★</div>
-            <blockquote>We have the weekly subscription at our café and customers ask about the flowers constantly. Always fresh, never the same twice.</blockquote>
-            <figcaption class="quote-author">
-              <img src="img/customer-marcus.jpg" alt="Marcus Bell" width="50" height="50" loading="lazy">
-              <div><b>Marcus Bell</b><span>Corporate subscriber</span></div>
-            </figcaption>
-          </figure>
         </div>
       </div>
     </section>
 
     <!-- ==================================================== DELIVERY -->
-    <section class="section" id="delivery">
+    <section class="section bg-cream2" id="delivery">
       <div class="container">
         <div class="delivery-grid">
           <div class="reveal">
-            <span class="eyebrow">Delivery &amp; Areas</span>
-            <h2 class="section-title">We deliver across the city</h2>
-            <p class="section-lead">Order before 2pm on weekdays for same-day delivery. We hand-carry every bouquet upright and offer a photo on delivery for gifts.</p>
+            <span class="eyebrow">Delivery</span>
+            <h2 class="section-title">Delivered on the date you choose</h2>
+            <p class="section-lead">At checkout you enter where the bouquet should go and choose a delivery date. Orders can be scheduled from tomorrow onwards.</p>
             <ul class="area-list">
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Rowan Hill</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Old Town</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Harbourside</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Elm Park</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Ashgrove</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Meadowbank</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> Riverside</li>
-              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg> The Quarter</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Delivery date of your choice</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Recipient name and phone</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Optional card message</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Order status you can follow</li>
             </ul>
           </div>
 
           <div class="delivery-info reveal d1">
             <div class="row-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
               <div>
-                <h4>Same-day cutoff — 2:00pm</h4>
-                <p>Order before 2pm, Monday to Saturday, for delivery that afternoon between 3pm and 7pm.</p>
+                <h3 class="h4">Choose the date</h3>
+                <p>Pick any delivery date from tomorrow onwards when you check out.</p>
               </div>
             </div>
             <div class="row-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               <div>
-                <h4>Free within 5 miles</h4>
-                <p>Delivery is free within five miles of the studio. A flat $8 applies to outer neighbourhoods.</p>
+                <h3 class="h4">Add a card message</h3>
+                <p>Write a short note to go with the bouquet, up to 255 characters.</p>
               </div>
             </div>
             <div class="row-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
               <div>
-                <h4>Photo on delivery</h4>
-                <p>Sending a gift? We can text you a photo the moment it is handed over, so you never miss the smile.</p>
+                <h3 class="h4">Follow the status</h3>
+                <p>Each order moves through pending, confirmed, preparing, out for delivery and delivered.</p>
               </div>
             </div>
             <div class="row-item">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h18v6H3zM3 9v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9M10 13h4"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
               <div>
-                <h4>Studio collection</h4>
-                <p>Prefer to pick up? Collect from the shop on Rowan Hill, open Tuesday to Sunday, 9am to 6pm.</p>
+                <h3 class="h4">Questions?</h3>
+                <p>Send us a message from the <a href="contact.php">Contact page</a> and we will reply by email.</p>
               </div>
             </div>
           </div>
@@ -451,9 +308,9 @@ $featured = (new Product())->featured(8);
     <section class="section-sm" id="newsletter">
       <div class="container">
         <div class="newsletter reveal">
-          <span class="eyebrow center" style="color:rgba(255,255,255,.85)">Join the List</span>
-          <h2>Bloom notes in your inbox</h2>
-          <p>What's in season, care tips, and the occasional subscriber-only bunch. One gentle email a week — no more.</p>
+          <span class="eyebrow center" style="color:rgba(255,255,255,.85)">Newsletter</span>
+          <h2>New bouquets in your inbox</h2>
+          <p>Subscribe to hear about new bouquets and seasonal picks.</p>
           <form class="news-form" data-validate novalidate>
             <label for="news-email" class="visually-hidden">Email address</label>
             <input type="email" id="news-email" name="email" placeholder="you@example.com" required autocomplete="email">
@@ -463,100 +320,5 @@ $featured = (new Product())->featured(8);
         </div>
       </div>
     </section>
-  </main>
 
-  <!-- ======================================================= FOOTER -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <a href="index.php" class="footer-brand">Fleur<span class="mark">.</span></a>
-          <p>A small flower studio on Rowan Hill, tying seasonal bouquets by hand and delivering them across the city the same day.</p>
-          <div class="social-row">
-            <a href="#" aria-label="Fleur on Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
-            <a href="#" aria-label="Fleur on Pinterest"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M8.5 20c1-3 2.5-8 2.5-8m0 0c-.4-1 0-2.5 1.5-2.5s2 1.3 1.6 3c-.4 2-2 3-3.1 2.5"/></svg></a>
-            <a href="#" aria-label="Fleur on Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 3h-3a4 4 0 0 0-4 4v3H5v4h3v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
-          </div>
-        </div>
-
-        <div class="footer-col">
-          <h5>Shop</h5>
-          <ul>
-            <li><a href="shop.php">All bouquets</a></li>
-            <li><a href="shop.php">Birthday</a></li>
-            <li><a href="shop.php">Weddings</a></li>
-            <li><a href="#subscription">Subscriptions</a></li>
-            <li><a href="shop.php">Sympathy</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h5>Studio</h5>
-          <ul>
-            <li><a href="#story">Our story</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#gallery">Gallery</a></li>
-            <li><a href="#delivery">Delivery areas</a></li>
-            <li><a href="#reviews">Reviews</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h5>Visit Us</h5>
-          <ul class="footer-contact">
-            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> 14 Rowan Hill Lane, Old Town</li>
-            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.2a2 2 0 0 1 2.1-.4c.8.3 1.7.6 2.6.7a2 2 0 0 1 1.7 2z"/></svg> (555) 0142 — 3390</li>
-            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> hello@fleur-studio.example</li>
-            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Tue–Sun, 9am–6pm</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <span>&copy; 2026 Fleur Flower Studio. Built on Bootstrap 5.</span>
-        <span><a href="#">Privacy</a> &middot; <a href="#">Terms</a> &middot; <a href="#">Care Guide</a></span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ================================================= CART DRAWER -->
-  <div class="cart-overlay" aria-hidden="true"></div>
-  <aside class="cart-drawer" aria-hidden="true" aria-label="Shopping bag" role="dialog" aria-modal="true">
-    <div class="cart-head">
-      <h3>Your Bag</h3>
-      <button type="button" class="cart-close" aria-label="Close bag">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-    <div class="cart-items"></div>
-    <div class="cart-foot">
-      <div class="cart-total">
-        <span class="lbl">Subtotal</span>
-        <span class="amt" data-cart-total>$0.00</span>
-      </div>
-      <p class="cart-note">Delivery calculated at checkout. Free within 5 miles.</p>
-      <a href="#" class="btn btn-rose btn-block">Checkout</a>
-    </div>
-  </aside>
-
-  <!-- ================================================== LIGHTBOX -->
-  <div class="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
-    <button type="button" class="lb-btn lb-close" aria-label="Close image">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6 6 18M6 6l12 12"/></svg>
-    </button>
-    <button type="button" class="lb-btn lb-prev" aria-label="Previous image">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 18 9 12l6-6"/></svg>
-    </button>
-    <button type="button" class="lb-btn lb-next" aria-label="Next image">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"/></svg>
-    </button>
-    <figure style="margin:0">
-      <img src="" alt="">
-      <figcaption></figcaption>
-    </figure>
-  </div>
-
-  <script src="js/vendor/bootstrap.bundle.min.js"></script>
-  <script src="js/main.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/includes/footer.php'; ?>

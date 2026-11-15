@@ -25,7 +25,7 @@ require __DIR__ . '/includes/header.php';
 <h1 class="h3 mb-1">Order #<?= $order['order_id'] ?></h1>
 <p class="mb-4">Status: <span class="badge text-bg-secondary"><?= e($order['status']) ?></span></p>
 
-<div class="row g-5">
+<div class="row g-4 g-xl-5">
   <div class="col-lg-7">
     <table class="table align-middle">
       <thead><tr><th></th><th>Bouquet</th><th>Price</th><th>Qty</th><th class="text-end">Subtotal</th></tr></thead>

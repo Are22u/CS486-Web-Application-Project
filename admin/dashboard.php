@@ -35,7 +35,7 @@ require __DIR__ . '/../includes/header.php';
   <?php endforeach; ?>
 </div>
 
-<div class="row g-5">
+<div class="row g-4 g-xl-5">
   <div class="col-lg-7">
     <h2 class="h5">Recent orders</h2>
     <table class="table align-middle">
