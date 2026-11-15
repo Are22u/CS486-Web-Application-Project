@@ -47,12 +47,12 @@ class Order
      * Turns the cart into an order. Everything happens inside one transaction:
      * if any step fails (e.g. a product sold out a second ago), nothing is saved.
      *
-     * Returns the new order_id. Throws RuntimeException with a user-friendly message on failure.
+     * Returns the new order_id. Throws AppException with a user-friendly message on failure.
      */
     public function create(int $userId, array $cartItems, array $data): int
     {
         if (empty($cartItems)) {
-            throw new RuntimeException('Your cart is empty.');
+            throw new AppException('Your cart is empty.');
         }
 
         $this->db->beginTransaction();
@@ -67,10 +67,10 @@ class Order
                     [$item['id']]
                 );
                 if ($product === null) {
-                    throw new RuntimeException('A product in your cart is no longer available.');
+                    throw new AppException('A product in your cart is no longer available.');
                 }
                 if ($item['qty'] > $product['stock']) {
-                    throw new RuntimeException("Sorry, only {$product['stock']} of \"{$product['name']}\" left in stock.");
+                    throw new AppException("Sorry, only {$product['stock']} of \"{$product['name']}\" left in stock.");
                 }
                 $total  += $product['price'] * $item['qty'];
                 $lines[] = ['product_id' => $product['product_id'], 'qty' => $item['qty'], 'price' => $product['price']];
@@ -183,30 +183,68 @@ class Order
         );
     }
 
-    /** Admin changes an order's status. Cancelling puts the stock back. */
+    /**
+     * Admin changes an order's status.
+     *
+     * Stock rules:
+     *   - active -> cancelled : the order's quantities are added back to stock
+     *   - cancelled -> active : stock is checked first; if any product no longer
+     *                           has enough, nothing changes and an AppException
+     *                           explains which product is short
+     *   - any other change     : stock is not touched
+     *
+     * Everything runs in one transaction. The order row and product rows are
+     * locked (FOR UPDATE), and the status is re-read inside the transaction,
+     * so two quick clicks cannot adjust the stock twice.
+     *
+     * Returns false for an unknown status or order.
+     */
     public function updateStatus(int $orderId, string $status): bool
     {
         if (!in_array($status, self::STATUSES, true)) {
             return false;
         }
-        $order = $this->find($orderId);
-        if ($order === null) {
-            return false;
-        }
 
         $this->db->beginTransaction();
         try {
+            $order = $this->db->fetch('SELECT id, status FROM orders WHERE id = ? FOR UPDATE', [$orderId]);
+            if ($order === null) {
+                $this->db->rollBack();
+                return false;
+            }
+            if ($order['status'] === $status) {          // nothing to change
+                $this->db->commit();
+                return true;
+            }
+
             $wasCancelled = $order['status'] === 'cancelled';
             $nowCancelled = $status === 'cancelled';
 
             if ($wasCancelled !== $nowCancelled) {
-                // cancelling returns stock (+), un-cancelling takes it again (-)
-                $sign = $nowCancelled ? '+' : '-';
+                // Total quantity per product in this order
+                $needed = [];
                 foreach ($this->items($orderId) as $item) {
-                    $this->db->execute(
-                        "UPDATE products SET stock = stock $sign ? WHERE id = ?",
-                        [$item['quantity'], $item['product_id']]
-                    );
+                    $pid = (int) $item['product_id'];
+                    $needed[$pid] = ($needed[$pid] ?? 0) + (int) $item['quantity'];
+                }
+
+                if ($nowCancelled) {
+                    foreach ($needed as $pid => $qty) {
+                        $this->db->execute('UPDATE products SET stock = stock + ? WHERE id = ?', [$qty, $pid]);
+                    }
+                } else {
+                    // Re-opening: make sure every product still has enough stock before changing anything
+                    foreach ($needed as $pid => $qty) {
+                        $product = $this->db->fetch('SELECT name, stock FROM products WHERE id = ? FOR UPDATE', [$pid]);
+                        if ($product === null || (int) $product['stock'] < $qty) {
+                            $left = $product ? (int) $product['stock'] : 0;
+                            $name = $product ? $product['name'] : 'a product';
+                            throw new AppException("Order #$orderId can't be re-opened: not enough stock of \"$name\" (needs $qty, only $left left).");
+                        }
+                    }
+                    foreach ($needed as $pid => $qty) {
+                        $this->db->execute('UPDATE products SET stock = stock - ? WHERE id = ?', [$qty, $pid]);
+                    }
                 }
             }
 

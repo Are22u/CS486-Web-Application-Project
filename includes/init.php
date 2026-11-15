@@ -12,6 +12,35 @@
 // "tomorrow" in PHP differ from "tomorrow" in the browser around midnight).
 date_default_timezone_set('Asia/Riyadh');
 
+// ---------------------------------------------------------
+// Errors: never print PHP warnings, SQL or file paths to visitors.
+// Details go to the PHP error log (in XAMPP: xampp/php/logs/php_error_log).
+// ---------------------------------------------------------
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
+
+set_exception_handler(function (Throwable $e) {
+    error_log('[Fleur] ' . get_class($e) . ': ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
+    $isAjax = str_contains($_SERVER['SCRIPT_NAME'] ?? '', '/ajax/');
+    if ($isAjax) {
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode(['success' => false, 'message' => 'Something went wrong. Please try again.']);
+    } else {
+        echo '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Something went wrong | Fleur</title></head>'
+           . '<body style="font-family:sans-serif;max-width:560px;margin:4rem auto;padding:0 1rem">'
+           . '<h1>Something went wrong</h1><p>Sorry, we could not complete your request. Please go back and try again.</p>'
+           . '<p><a href="javascript:history.back()">Go back</a></p></body></html>';
+    }
+});
+
+// Session cookie: not readable by JavaScript, not sent with cross-site requests
+session_set_cookie_params(['httponly' => true, 'samesite' => 'Lax']);
 session_start();
 
 // ---------------------------------------------------------
@@ -60,10 +89,10 @@ function redirect(string $path): void
     exit;
 }
 
-/** Formats a price consistently everywhere: money(68) -> "$68.00" */
+/** Formats a price the same way everywhere: money(255) -> "SAR 255.00" (Saudi Riyals) */
 function money($amount): string
 {
-    return '$' . number_format((float) $amount, 2);
+    return 'SAR ' . number_format((float) $amount, 2);
 }
 
 // ---------------------------------------------------------

@@ -48,8 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 setFlash('success', "\"{$data['name']}\" was updated.");
             }
             redirect('admin/products.php');
-        } catch (RuntimeException $e) {
-            $errors['image'] = $e->getMessage();
+        } catch (AppException $e) {
+            $errors['form'] = $e->getMessage();          // safe, user-friendly message
+        } catch (PDOException $e) {
+            error_log('[Fleur] Product save failed: ' . $e->getMessage());
+            $errors['form'] = 'The product could not be saved. Please try again.';
         }
     }
 }
@@ -77,7 +80,7 @@ require __DIR__ . '/../includes/header.php';
     <?= fieldError($errors, 'description') ?>
   </div>
   <div class="col-md-4">
-    <label class="form-label" for="price">Price ($)</label>
+    <label class="form-label" for="price">Price (SAR)</label>
     <input class="form-control<?= invalid($errors, 'price') ?>" type="number" step="0.01" min="0.01" id="price" name="price" value="<?= $val('price') ?>" required>
     <?= fieldError($errors, 'price') ?>
   </div>

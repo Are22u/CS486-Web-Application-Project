@@ -41,6 +41,9 @@ class Database
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ]);
         } catch (PDOException $e) {
+            // Log the real reason; show visitors a message without credentials or server details
+            error_log('[Fleur] Database connection failed: ' . $e->getMessage());
+            http_response_code(500);
             die('Database connection failed. Check config/database.php and that MySQL is running in XAMPP.');
         }
     }

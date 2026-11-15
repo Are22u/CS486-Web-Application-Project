@@ -37,9 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $cart->clear();
             setFlash('success', "Thank you! Your order #$orderId has been placed.");
             redirect('order-details.php?id=' . $orderId);
-        } catch (RuntimeException $e) {
+        } catch (AppException $e) {
             $errors['form'] = $e->getMessage();   // e.g. "only 2 left in stock"
             $items = $cart->items();               // refresh with current stock
+        } catch (PDOException $e) {
+            error_log('[Fleur] Checkout failed: ' . $e->getMessage());
+            $errors['form'] = 'Your order could not be placed. Please try again.';
+            $items = $cart->items();
         }
     }
 }
@@ -52,7 +56,7 @@ require __DIR__ . '/includes/header.php';
 <h1 class="h3 mb-4">Checkout</h1>
 <?php if (isset($errors['form'])): ?><div class="alert alert-danger"><?= e($errors['form']) ?></div><?php endif; ?>
 
-<div class="row g-5">
+<div class="row g-4 g-xl-5">
   <div class="col-lg-7">
     <h2 class="h5 mb-3">Delivery details</h2>
     <form method="post" id="checkout-form" novalidate>

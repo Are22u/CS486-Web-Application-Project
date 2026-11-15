@@ -60,6 +60,18 @@ class Product
         );
     }
 
+    /** Lowest price per occasion slug, for the "From SAR ..." labels on the homepage. */
+    public function minPriceByOccasion(): array
+    {
+        $rows = $this->db->fetchAll(
+            'SELECT c.slug, MIN(p.price) AS min_price
+             FROM occasions c
+             JOIN products p ON p.occasion_id = c.id
+             GROUP BY c.slug'
+        );
+        return array_column($rows, 'min_price', 'slug');
+    }
+
     public function categories(): array
     {
         return $this->db->fetchAll('SELECT id AS category_id, name, slug FROM occasions ORDER BY id');
@@ -148,57 +160,92 @@ class Product
         $target   = __DIR__ . '/../img/uploads/' . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $target)) {
-            throw new RuntimeException('Could not save the uploaded image.');
+            throw new AppException('Could not save the uploaded image. Please try again.');
         }
         return 'img/uploads/' . $filename;
     }
 
+    /**
+     * Adds a product. The image is saved first; if the INSERT then fails,
+     * the new file is removed so no orphan upload is left behind.
+     */
     public function create(array $data, array $file): int
     {
-        $this->db->execute(
-            'INSERT INTO products (occasion_id, name, description, price, image, color, tag, stock)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [
-                (int) $data['category_id'],
-                $data['name'],
-                $data['description'],
-                $data['price'],
-                $this->saveImage($file),
-                $data['color'],
-                $data['tag'] !== '' ? $data['tag'] : null,
-                (int) $data['stock'],
-            ]
-        );
+        $image = $this->saveImage($file);
+
+        try {
+            $this->db->execute(
+                'INSERT INTO products (occasion_id, name, description, price, image, color, tag, stock)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    (int) $data['category_id'],
+                    $data['name'],
+                    $data['description'],
+                    $data['price'],
+                    $image,
+                    $data['color'],
+                    $data['tag'] !== '' ? $data['tag'] : null,
+                    (int) $data['stock'],
+                ]
+            );
+        } catch (Throwable $e) {
+            $this->deleteUploadedImage($image);
+            throw $e;
+        }
         return $this->db->lastInsertId();
     }
 
-    /** Updates a product. If no new image was uploaded, the old one is kept. */
+    /**
+     * Updates a product. If no new image was uploaded, the old one is kept.
+     *
+     * Order of operations when the image is replaced:
+     *   1. the new image was already validated by validate()
+     *   2. save the new file
+     *   3. update the database row
+     *   4. only after the update succeeded, delete the old file
+     * If the update fails, the new file is removed and the old image stays
+     * in place, so the product never points at a missing file.
+     */
     public function update(int $productId, array $data, ?array $file): void
     {
         $existing = $this->find($productId);
-        $image = $existing['image'];
-
-        if ($file && $file['error'] === UPLOAD_ERR_OK) {
-            $image = $this->saveImage($file);
-            $this->deleteUploadedImage($existing['image']);
+        if ($existing === null) {
+            throw new AppException('Product not found.');
         }
 
-        $this->db->execute(
-            'UPDATE products
-             SET occasion_id = ?, name = ?, description = ?, price = ?, image = ?, color = ?, tag = ?, stock = ?
-             WHERE id = ?',
-            [
-                (int) $data['category_id'],
-                $data['name'],
-                $data['description'],
-                $data['price'],
-                $image,
-                $data['color'],
-                $data['tag'] !== '' ? $data['tag'] : null,
-                (int) $data['stock'],
-                $productId,
-            ]
-        );
+        $oldImage = $existing['image'];
+        $newImage = null;
+        if ($file && $file['error'] === UPLOAD_ERR_OK) {
+            $newImage = $this->saveImage($file);
+        }
+
+        try {
+            $this->db->execute(
+                'UPDATE products
+                 SET occasion_id = ?, name = ?, description = ?, price = ?, image = ?, color = ?, tag = ?, stock = ?
+                 WHERE id = ?',
+                [
+                    (int) $data['category_id'],
+                    $data['name'],
+                    $data['description'],
+                    $data['price'],
+                    $newImage ?? $oldImage,
+                    $data['color'],
+                    $data['tag'] !== '' ? $data['tag'] : null,
+                    (int) $data['stock'],
+                    $productId,
+                ]
+            );
+        } catch (Throwable $e) {
+            if ($newImage !== null) {
+                $this->deleteUploadedImage($newImage);
+            }
+            throw $e;
+        }
+
+        if ($newImage !== null) {
+            $this->deleteUploadedImage($oldImage);
+        }
     }
 
     /**

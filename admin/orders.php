@@ -15,9 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $ok = $orderModel->updateStatus($orderId, $status);
             setFlash($ok ? 'success' : 'error', $ok ? "Order #$orderId is now \"$status\"." : 'Could not update that order.');
-        } catch (PDOException $e) {
+        } catch (AppException $e) {
             // e.g. re-opening a cancelled order when the stock has already been sold
-            setFlash('error', "Order #$orderId can't be re-opened: not enough stock left.");
+            setFlash('error', $e->getMessage());
+        } catch (PDOException $e) {
+            error_log('[Fleur] Order status update failed: ' . $e->getMessage());
+            setFlash('error', "Order #$orderId could not be updated. Please try again.");
         }
     }
     $filter = post('filter');
@@ -33,7 +36,7 @@ require __DIR__ . '/../includes/header.php';
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
   <h1 class="h3 m-0">Orders (<?= count($orders) ?>)</h1>
   <form method="get" class="d-flex gap-2">
-    <select class="form-select" name="status" onchange="this.form.submit()">
+    <select class="form-select" name="status" onchange="this.form.submit()" aria-label="Filter orders by status">
       <option value="">All statuses</option>
       <?php foreach (Order::STATUSES as $s): ?>
         <option <?= $filter === $s ? 'selected' : '' ?>><?= e($s) ?></option>
@@ -60,7 +63,7 @@ require __DIR__ . '/../includes/header.php';
             <?= csrfField() ?>
             <input type="hidden" name="order_id" value="<?= $o['order_id'] ?>">
             <input type="hidden" name="filter" value="<?= e($filter) ?>">
-            <select class="form-select form-select-sm" name="status" style="min-width: 150px">
+            <select class="form-select form-select-sm" name="status" style="min-width: 150px" aria-label="Status for order #<?= $o['order_id'] ?>">
               <?php foreach (Order::STATUSES as $s): ?>
                 <option <?= $o['status'] === $s ? 'selected' : '' ?>><?= e($s) ?></option>
               <?php endforeach; ?>

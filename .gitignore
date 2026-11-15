@@ -4,6 +4,7 @@ config/database.php
 # Uploaded product images from the admin panel
 img/uploads/*
 !img/uploads/.gitkeep
+!img/uploads/.htaccess
 
 # OS / editor files
 .DS_Store
