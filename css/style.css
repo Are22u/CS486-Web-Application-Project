@@ -1275,3 +1275,5 @@ a:hover { color: var(--rose-deep); }
 .product-facts { max-width: 420px; background: transparent; }
 .product-facts th { width: 40%; font-weight: 500; color: var(--stone); }
 .add-btn-lg { padding: .75rem 1.6rem; font-size: .95rem; }
+/* Logo dot: Bootstrap's .mark class adds a yellow highlight; keep only the rose colour */
+.nav-brand .mark, .footer-brand .mark { background: none; padding: 0; }
