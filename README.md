@@ -4,6 +4,8 @@ Fleur is a dynamic, database-driven online flower shop. Customers browse bouquet
 
 ![Home page](docs/screenshots/00-home.jpg)
 
+📄 **[Read the full project report (PDF)](docs/Fleur_Project_Report.pdf)**
+
 ---
 
 ## Technologies
